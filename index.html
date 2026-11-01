@@ -14,7 +14,7 @@
         
         <header class="text-center space-y-1">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-cyan-400">✉️ Campus Email Generator</h1>
-            <p class="text-xs sm:text-sm text-slate-400">Turn raw complaints into polished, respectful emails in seconds.</p>
+            <p class="text-xs sm:text-sm text-slate-400">Instant AI email drafting • No setup or login required</p>
         </header>
 
         <!-- Main Card -->
@@ -42,7 +42,7 @@
             <!-- 3. Submit Button -->
             <button id="generateBtn" onclick="generateEmail()" 
                 class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg shadow-cyan-500/20 active:scale-[0.99] transition flex items-center justify-center gap-2">
-                <i data-lucide="send" class="w-4 h-4"></i>
+                <i data-lucide="zap" class="w-4 h-4"></i>
                 <span id="btnText">Draft Formal Email</span>
             </button>
 
@@ -65,17 +65,6 @@
     <script>
         lucide.createIcons();
 
-        // 🔑 YOUR SCRAMBLED GEMINI KEY (AIzaSy...)
-        const SCRAMBLED_KEY = "QVEuQWI4Uk42SW1XRE9nZ3FlQVptMk1SZWJXQ2NsVk10ZVMxWF9OUnF2VC1kTk95S1U5TFE=";
-
-        function getDecodedKey() {
-            try {
-                return atob(SCRAMBLED_KEY);
-            } catch (e) {
-                return "";
-            }
-        }
-
         async function generateEmail() {
             const recipient = document.getElementById('recipientSelect').value;
             const issue = document.getElementById('issueInput').value.trim();
@@ -89,56 +78,27 @@
                 return;
             }
 
-            const apiKey = getDecodedKey();
-            if (!apiKey || apiKey === "PASTE_YOUR_SCRAMBLED_GEMINI_KEY_HERE") {
-                alert("Please paste your scrambled Gemini key into line 61 of index.html!");
-                return;
-            }
-
             btn.disabled = true;
-            btnText.innerText = "Drafting with Gemini 3.8 Flash...";
+            btnText.innerText = "Drafting email...";
             outputContainer.classList.remove('hidden');
-            emailOutput.innerText = "⚡ Drafting your email...";
+            emailOutput.innerText = "⚡ Drafting a polite formal email to " + recipient + "...";
 
             const prompt = `
-                You are a formal communications expert for college students.
-                Draft a formal, polite, and persuasive email to the "${recipient}".
-                The student's raw issue is: "${issue}".
-
+                Draft a formal, respectful, and concise email to the "${recipient}".
+                The student's issue is: "${issue}".
                 Include:
-                - Subject line
+                - Clear Subject line
                 - Respectful salutation
-                - 2 concise body paragraphs explaining the situation and requesting urgent action
-                - Professional sign-off placeholders: [Student Name], [Roll Number], [Room / Dept]
+                - 2 short body paragraphs politely asking for urgent assistance
+                - Sign-off placeholders: [Student Name], [Roll Number], [Room / Dept]
+                Do not include any extra chat or filler; only output the formal email text.
             `;
 
             try {
-                // Notice: DIRECT CALL TO gemini-3.8-flash (No older models!)
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            thinkingConfig: { thinkingBudget: 0 }
-                        }
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    emailOutput.innerText = "❌ Note: " + data.error.message;
-                    return;
-                }
-
-                const parts = data.candidates?.[0]?.content?.parts || [];
-                const draftedEmail = parts
-                    .filter(p => p.text && !p.thought)
-                    .map(p => p.text)
-                    .join("\n") || parts.map(p => p.text).join("\n");
+                // Notice: 100% Free, Zero API Keys, Universal Public AI Engine!
+                const url = "https://text.pollinations.ai/" + encodeURIComponent(prompt);
+                const response = await fetch(url);
+                const draftedEmail = await response.text();
 
                 emailOutput.innerText = draftedEmail;
 
