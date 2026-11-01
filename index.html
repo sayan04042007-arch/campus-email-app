@@ -109,7 +109,7 @@
                     });
                     const listData = await listRes.json();
                     if (listData.data && listData.data.length > 0) {
-                        const available = listData.data.find(m => m.id.includes("llama") || m.id.includes("gemma") || m.id.includes("mixtral"));
+                        const available = listData.data.find(m => !m.id.includes("guard") && (m.id.includes("llama") || m.id.includes("mixtral") || m.id.includes("gemma")));
                         if (available) {
                             selectedModel = available.id;
                         }
@@ -142,7 +142,7 @@
                     body: JSON.stringify({
                         model: selectedModel,
                         messages: [
-                            { role: "system", content: "You draft polite, professional formal emails for university students." },
+                    
                             { role: "user", content: prompt }
                         ],
                         max_tokens: 500,
