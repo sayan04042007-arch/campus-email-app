@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicSnap | Smart Campus & City Issue Reporter</title>
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f59e0b">
+
+    <!-- Tailwind CSS & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Modern Cyber-Grid Background Pattern */
+        .bg-grid-pattern {
+            background-color: #030712;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(147, 51, 234, 0.08) 0px, transparent 50%),
+                radial-gradient(#1e293b 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+        }
+
+        /* Glass Glow Box Shadow */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-grid-pattern text-slate-100 min-h-screen py-10 px-4 flex flex-col items-center justify-center relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950 font-sans">
+
+    <!-- AMBIENT GLOW ORBS IN BACKGROUND -->
+    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="absolute bottom-10 right-10 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <div class="max-w-md sm:max-w-lg w-full space-y-5 relative z-10">
+        
+        <!-- HEADER -->
+        <header class="text-center space-y-2">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-400 text-xs font-bold uppercase tracking-wider shadow-[0_0_20px_rgba(245,158,11,0.25)]">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                Geo-Smart Incident Engine
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center justify-center gap-2">
+                CivicSnap <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-amber-200">AI</span>
+            </h1>
+            
+            <p class="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto leading-relaxed">
+                Snap broken infrastructure, lock GPS coordinates, and generate official dispatch tickets.
+            </p>
+        </header>
+
+        <!-- MAIN GLASS CARD -->
+        <div class="glass-card rounded-3xl p-6 sm:p-7 space-y-5">
+
+            <!-- 1. CAMERA & PHOTO UPLOAD -->
+            <div class="space-y-1.5">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i>
+                    Photo Evidence
+                </label>
+                
+                <div id="dropzone" onclick="document.getElementById('photoInput').click()"
+                    class="group border-2 border-dashed border-slate-700/80 hover:border-amber-400/60 bg-slate-950/40 hover:bg-slate-950/70 rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center space-y-2.5">
+                    
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition duration-300 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+                        <i data-lucide="plus-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div class="text-xs sm:text-sm">
+                        <span class="text-amber-400 font-bold group-hover:underline">Tap to snap photo</span> or upload evidence
+                    </div>
+                    <p class="text-[11px] text-slate-500">Potholes, leaks, wiring faults, overflowing bins</p>
+                </div>
+
+                <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhoto(event)">
+
+                <div id="previewBox" class="hidden relative mt-3 rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 shadow-inner">
+                    <img id="photoPreview" src="" alt="Evidence" class="w-full max-h-52 object-cover">
+                    <button onclick="removePhoto()" class="absolute top-2.5 right-2.5 bg-slate-900/90 hover:bg-red-500 text-white p-1.5 rounded-xl border border-slate-700 transition">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. HIGH-TECH GPS STATUS BOX -->
+            <div class="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span id="gpsPulse" class="relative flex h-2 w-2">
+                            <span class="inline-flex rounded-full h-2 w-2 bg-slate-600"></span>
+                        </span>
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                            Satellite Telemetry
+                        </span>
+                    </div>
+
+                    <button type="button" onclick="acquireGPS()" id="gpsBtn" 
+                        class="text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                        <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+                        <span id="gpsBtnText">Lock GPS</span>
+                    </button>
+                </div>
+                <div id="gpsStatus" class="text-xs text-slate-400 font-mono leading-relaxed">
+                    Coordinates not locked. Tap button or snap photo.
+                </div>
+            </div>
+
+            <!-- 3. ISSUE NOTES -->
+            <div class="space-y-1.5">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5 text-amber-400"></i>
+                    Issue Details (Optional)
+                </label>
+                <input type="text" id="userNotes" placeholder="e.g. Water cooler leaking on 2nd floor near library..."
+                    class="w-full p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 transition">
+            </div>
+
+            <!-- 4. SUBMIT BUTTON -->
+            <button id="submitBtn" onclick="generateTicket()" 
+                class="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:opacity-95 text-slate-950 font-extrabold py-4 px-6 rounded-2xl text-sm shadow-[0_0_30px_rgba(245,158,11,0.35)] active:scale-[0.98] transition flex items-center justify-center gap-2">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                <span id="btnText">Generate Official Incident Ticket</span>
+            </button>
+
+            <!-- 5. TICKET DISPLAY -->
+            <div id="ticketContainer" class="hidden space-y-3 pt-3 border-t border-slate-800">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        Dispatch Order Generated:
+                    </span>
+                    <div class="flex gap-2">
+                        <button onclick="shareWhatsApp()" class="text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                            <i data-lucide="send" class="w-3 h-3"></i>
+                            WhatsApp
+                        </button>
+                        <button onclick="copyTicket()" class="text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                            <span id="copyText">Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="ticketOutput" class="p-4 bg-slate-950/90 border border-slate-800 rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap text-slate-200 font-mono shadow-inner border-l-4 border-l-amber-500"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        let userLat = null;
+        let userLon = null;
+        let photoSelected = false;
+
+        // GPS DETECTION
+        function acquireGPS() {
+            const gpsStatus = document.getElementById('gpsStatus');
+            const gpsBtnText = document.getElementById('gpsBtnText');
+            const gpsPulse = document.getElementById('gpsPulse');
+
+            if (!navigator.geolocation) {
+                gpsStatus.innerText = "❌ GPS not supported on this browser.";
+                return;
+            }
+
+            gpsBtnText.innerText = "Locking...";
+            gpsStatus.innerText = "🛰️ Handshaking with satellites...";
+
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    userLat = pos.coords.latitude.toFixed(5);
+                    userLon = pos.coords.longitude.toFixed(5);
+                    const accuracy = Math.round(pos.coords.accuracy);
+
+                    gpsPulse.innerHTML = `
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    `;
+
+                    gpsStatus.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-emerald-400 font-bold">📍 ${userLat}, ${userLon}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">±${accuracy}m precision</span>
+                        </div>
+                        <a href="https://www.google.com/maps?q=${userLat},${userLon}" target="_blank" class="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 underline text-[11px] mt-1 font-sans">
+                            Open in Google Maps ↗
+                        </a>
+                    `;
+                    gpsBtnText.innerText = "Locked 🛰️";
+                },
+                function(err) {
+                    gpsStatus.innerText = "⚠️ Location error: " + err.message + ". Allow permissions!";
+                    gpsBtnText.innerText = "Retry";
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        // PHOTO HANDLER
+        function handlePhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photoPreview').src = e.target.result;
+                document.getElementById('previewBox').classList.remove('hidden');
+                document.getElementById('dropzone').classList.add('hidden');
+                photoSelected = true;
+                lucide.createIcons();
+            };
+            reader.readAsDataURL(file);
+
+            if (!userLat) acquireGPS();
+        }
+
+        function removePhoto() {
+            document.getElementById('photoInput').value = '';
+            document.getElementById('previewBox').classList.add('hidden');
+            document.getElementById('dropzone').classList.remove('hidden');
+            photoSelected = false;
+        }
+
+        // GENERATE TICKET (ZERO-KEY HIGH SPEED)
+        async function generateTicket() {
+            const notes = document.getElementById('userNotes').value.trim();
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const ticketContainer = document.getElementById('ticketContainer');
+            const ticketOutput = document.getElementById('ticketOutput');
+
+            if (!notes && !photoSelected) {
+                alert("Please snap a photo or describe the defect first!");
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.innerText = "Dispatching Ticket...";
+            ticketContainer.classList.remove('hidden');
+            ticketOutput.innerText = "⚡ Synthesizing GPS data & generating work order...";
+
+            const locationString = userLat ? `GPS: ${userLat}, ${userLon} (https://www.google.com/maps?q=${userLat},${userLon})` : "GPS: Campus Sector [Sensor Perm Pending]";
+            const ticketId = "CS-" + Math.floor(100000 + Math.random() * 900000);
+            const timestamp = new Date().toLocaleString();
+
+            const prompt = `
+                You are the Chief Campus Facilities Engineer.
+                Draft an Official Campus Incident & Maintenance Work Order Ticket.
+                
+                Issue: "${notes || 'Hazardous Campus Infrastructure Defect'}"
+                Coordinates: "${locationString}"
+                Ticket ID: "${ticketId}"
+                Timestamp: "${timestamp}"
+
+                Output in this exact structured format:
+                ================================================
+                OFFICIAL WORK ORDER DISPATCH: ${ticketId}
+                ================================================
+                📅 TIMESTAMP: ${timestamp}
+                📍 GEO-LOCATION: ${locationString}
+                🏢 ASSIGNED DEPARTMENT: [Pick: Electrical Maintenance / Civil & Sanitation / Campus Safety / HVAC]
+                ⚠️ SEVERITY CODE: [Rate 1-10 with urgency label]
+
+                📋 DEFECT ASSESSMENT:
+                [2 precise sentences diagnosing the defect and student risk]
+
+                🛠️ RECOMMENDED PROTOCOL:
+                1. [Immediate containment action]
+                2. [Repair and component replacement step]
+                3. [Final compliance audit]
+
+                STATUS: PRIORITY DISPATCH / PENDING REPAIR
+                ================================================
+            `;
+
+            try {
+                const url = "https://text.pollinations.ai/" + encodeURIComponent(prompt);
+                const res = await fetch(url);
+                const ticketText = await res.text();
+
+                ticketOutput.innerText = ticketText;
+
+            } catch (err) {
+                ticketOutput.innerText = "❌ Network error: " + err.message;
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = "Generate Official Incident Ticket";
+                lucide.createIcons();
+            }
+        }
+
+        function copyTicket() {
+            const text = document.getElementById('ticketOutput').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const copyText = document.getElementById('copyText');
+                copyText.innerText = "Copied! ✅";
+                setTimeout(() => { copyText.innerText = "Copy"; }, 2000);
+            });
+        }
+
+        function shareWhatsApp() {
+            const text = document.getElementById('ticketOutput').innerText;
+            const waUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+            window.open(waUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
